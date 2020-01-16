@@ -1,0 +1,12 @@
+/build
+
+/lib
+
+/Vocabulary/ORBvoc.txt
+/Vocabulary/bin_vocabulary
+
+/Thirdparty/DBoW2/build
+/Thirdparty/DBoW2/lib
+
+/Thirdparty/g2o/build
+/Thirdparty/g2o/lib

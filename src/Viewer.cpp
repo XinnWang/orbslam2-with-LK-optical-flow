@@ -26,20 +26,19 @@
 namespace ORB_SLAM2
 {
 
-Viewer::Viewer(System* pSystem, FrameDrawer *pFrameDrawer, MapDrawer *pMapDrawer, Tracking *pTracking, const string &strSettingPath):
-    mpSystem(pSystem), mpFrameDrawer(pFrameDrawer),mpMapDrawer(pMapDrawer), mpTracker(pTracking),
-    mbFinishRequested(false), mbFinished(true), mbStopped(false), mbStopRequested(false)
+Viewer::Viewer(System *pSystem, FrameDrawer *pFrameDrawer, MapDrawer *pMapDrawer, Tracking *pTracking, const string &strSettingPath) : mpSystem(pSystem), mpFrameDrawer(pFrameDrawer), mpMapDrawer(pMapDrawer), mpTracker(pTracking),
+                                                                                                                                       mbFinishRequested(false), mbFinished(true), mbStopped(false), mbStopRequested(false)
 {
     cv::FileStorage fSettings(strSettingPath, cv::FileStorage::READ);
 
     float fps = fSettings["Camera.fps"];
-    if(fps<1)
-        fps=30;
-    mT = 1e3/fps;
+    if (fps < 1)
+        fps = 30;
+    mT = 1e3 / fps;
 
     mImageWidth = fSettings["Camera.width"];
     mImageHeight = fSettings["Camera.height"];
-    if(mImageWidth<1 || mImageHeight<1)
+    if (mImageWidth < 1 || mImageHeight < 1)
     {
         mImageWidth = 640;
         mImageHeight = 480;
@@ -57,7 +56,7 @@ void Viewer::Run()
     //这个变量配合SetFinish函数用于指示该函数是否执行完毕
     mbFinished = false;
 
-    pangolin::CreateWindowAndBind("ORB-SLAM2: Map Viewer",1024,768);
+    pangolin::CreateWindowAndBind("ORB-SLAM2: Map Viewer", 1024, 768);
 
     // 3D Mouse handler requires depth testing to be enabled
     // 启动深度测试，OpenGL只绘制最前面的一层，绘制时检查当前像素前面是否有别的像素，如果别的像素挡住了它，那它就不会绘制
@@ -70,13 +69,13 @@ void Viewer::Run()
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     // 新建按钮和选择框，第一个参数为按钮的名字，第二个为默认状态，第三个为是否有选择框
-    pangolin::CreatePanel("menu").SetBounds(0.0,1.0,0.0,pangolin::Attach::Pix(175));
-    pangolin::Var<bool> menuFollowCamera("menu.Follow Camera",true,true);
-    pangolin::Var<bool> menuShowPoints("menu.Show Points",true,true);
-    pangolin::Var<bool> menuShowKeyFrames("menu.Show KeyFrames",true,true);
-    pangolin::Var<bool> menuShowGraph("menu.Show Graph",true,true);
-    pangolin::Var<bool> menuLocalizationMode("menu.Localization Mode",false,true);
-    pangolin::Var<bool> menuReset("menu.Reset",false,false);
+    pangolin::CreatePanel("menu").SetBounds(0.0, 1.0, 0.0, pangolin::Attach::Pix(175));
+    pangolin::Var<bool> menuFollowCamera("menu.Follow Camera", true, true);
+    pangolin::Var<bool> menuShowPoints("menu.Show Points", true, true);
+    pangolin::Var<bool> menuShowKeyFrames("menu.Show KeyFrames", true, true);
+    pangolin::Var<bool> menuShowGraph("menu.Show Graph", true, true);
+    pangolin::Var<bool> menuLocalizationMode("menu.Localization Mode", false, true);
+    pangolin::Var<bool> menuReset("menu.Reset", false, false);
 
     // Define Camera Render Object (for view / scene browsing)
     // 定义相机投影模型：ProjectionMatrix(w, h, fu, fv, u0, v0, zNear, zFar)
@@ -84,18 +83,17 @@ void Viewer::Run()
     //                观测目标位置：(0, 0, 0)
     //                观测的方位向量：(0.0,-1.0, 0.0)
     pangolin::OpenGlRenderState s_cam(
-                pangolin::ProjectionMatrix(1024,768,mViewpointF,mViewpointF,512,389,0.1,1000),
-                pangolin::ModelViewLookAt(mViewpointX,mViewpointY,mViewpointZ, 0,0,0,0.0,-1.0, 0.0)
-                );
+        pangolin::ProjectionMatrix(1024, 768, mViewpointF, mViewpointF, 512, 389, 0.1, 1000),
+        pangolin::ModelViewLookAt(mViewpointX, mViewpointY, mViewpointZ, 0, 0, 0, 0.0, -1.0, 0.0));
 
     // Add named OpenGL viewport to window and provide 3D Handler
     // 定义显示面板大小，orbslam中有左右两个面板，昨天显示一些按钮，右边显示图形
     // 前两个参数（0.0, 1.0）表明宽度和面板纵向宽度和窗口大小相同
     // 中间两个参数（pangolin::Attach::Pix(175), 1.0）表明右边所有部分用于显示图形
     // 最后一个参数（-1024.0f/768.0f）为显示长宽比
-    pangolin::View& d_cam = pangolin::CreateDisplay()
-            .SetBounds(0.0, 1.0, pangolin::Attach::Pix(175), 1.0, -1024.0f/768.0f)
-            .SetHandler(new pangolin::Handler3D(s_cam));
+    pangolin::View &d_cam = pangolin::CreateDisplay()
+                                .SetBounds(0.0, 1.0, pangolin::Attach::Pix(175), 1.0, -1024.0f / 768.0f)
+                                .SetHandler(new pangolin::Handler3D(s_cam));
 
     pangolin::OpenGlMatrix Twc;
     Twc.SetIdentity();
@@ -105,7 +103,7 @@ void Viewer::Run()
     bool bFollow = true;
     bool bLocalizationMode = false;
 
-    while(1)
+    while (1)
     {
         // 清除缓冲区中的当前可写的颜色缓冲 和 深度缓冲
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -115,27 +113,27 @@ void Viewer::Run()
 
         // 步骤2：根据相机的位姿调整视角
         // menuFollowCamera为按钮的状态，bFollow为真实的状态
-        if(menuFollowCamera && bFollow)
+        if (menuFollowCamera && bFollow)
         {
             s_cam.Follow(Twc);
         }
-        else if(menuFollowCamera && !bFollow)
+        else if (menuFollowCamera && !bFollow)
         {
-            s_cam.SetModelViewMatrix(pangolin::ModelViewLookAt(mViewpointX,mViewpointY,mViewpointZ, 0,0,0,0.0,-1.0, 0.0));
+            s_cam.SetModelViewMatrix(pangolin::ModelViewLookAt(mViewpointX, mViewpointY, mViewpointZ, 0, 0, 0, 0.0, -1.0, 0.0));
             s_cam.Follow(Twc);
             bFollow = true;
         }
-        else if(!menuFollowCamera && bFollow)
+        else if (!menuFollowCamera && bFollow)
         {
             bFollow = false;
         }
 
-        if(menuLocalizationMode && !bLocalizationMode)
+        if (menuLocalizationMode && !bLocalizationMode)
         {
             mpSystem->ActivateLocalizationMode();
             bLocalizationMode = true;
         }
-        else if(!menuLocalizationMode && bLocalizationMode)
+        else if (!menuLocalizationMode && bLocalizationMode)
         {
             mpSystem->DeactivateLocalizationMode();
             bLocalizationMode = false;
@@ -144,41 +142,37 @@ void Viewer::Run()
         d_cam.Activate(s_cam);
         // 步骤3：绘制地图和图像
         // 设置为白色，glClearColor(red, green, blue, alpha），数值范围(0, 1)
-        glClearColor(1.0f,1.0f,1.0f,1.0f);
+        glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
         mpMapDrawer->DrawCurrentCamera(Twc);
-        if(menuShowKeyFrames || menuShowGraph)
-            mpMapDrawer->DrawKeyFrames(menuShowKeyFrames,menuShowGraph);
-        if(menuShowPoints)
+        if (menuShowKeyFrames || menuShowGraph)
+            mpMapDrawer->DrawKeyFrames(menuShowKeyFrames, menuShowGraph);
+        if (menuShowPoints)
             mpMapDrawer->DrawMapPoints();
 
         pangolin::FinishFrame();
 
         cv::Mat im = mpFrameDrawer->DrawFrame();
-        cv::imshow("ORB-SLAM2: Current Frame",im);
+        cv::imshow("ORB-SLAM2: Current Frame", im);
         cv::waitKey(mT);
 
-        cv::Mat imd = mpFrameDrawer->DrawDepth();
-        cv::imshow("ORB-SLAM2: Current Depth",imd);
-        cv::waitKey(mT);
+        // cv::Mat imd = mpFrameDrawer->DrawDepth();
+        // cv::imshow("ORB-SLAM2: Current Depth", imd);
+        // cv::waitKey(mT);
 
         cv::Mat LKcolor = mpFrameDrawer->LK;
-        if(!LKcolor.empty())
+        if (!LKcolor.empty())
         {
-            cv::imshow("LK OpticalFlow",LKcolor);
+            cv::imshow("LK OpticalFlow", LKcolor);
             cv::waitKey(mT);
         }
 
-
-
-
-
-        if(menuReset)
+        if (menuReset)
         {
             menuShowGraph = true;
             menuShowKeyFrames = true;
             menuShowPoints = true;
             menuLocalizationMode = false;
-            if(bLocalizationMode)
+            if (bLocalizationMode)
                 mpSystem->DeactivateLocalizationMode();
             bLocalizationMode = false;
             bFollow = true;
@@ -187,17 +181,16 @@ void Viewer::Run()
             menuReset = false;
         }
 
-        if(Stop())
+        if (Stop())
         {
-            while(isStopped())
+            while (isStopped())
             {
-				//usleep(3000);
-				std::this_thread::sleep_for(std::chrono::milliseconds(3));
-
+                //usleep(3000);
+                std::this_thread::sleep_for(std::chrono::milliseconds(3));
             }
         }
 
-        if(CheckFinish())
+        if (CheckFinish())
             break;
     }
 
@@ -231,7 +224,7 @@ bool Viewer::isFinished()
 void Viewer::RequestStop()
 {
     unique_lock<mutex> lock(mMutexStop);
-    if(!mbStopped)
+    if (!mbStopped)
         mbStopRequested = true;
 }
 
@@ -246,9 +239,9 @@ bool Viewer::Stop()
     unique_lock<mutex> lock(mMutexStop);
     unique_lock<mutex> lock2(mMutexFinish);
 
-    if(mbFinishRequested)
+    if (mbFinishRequested)
         return false;
-    else if(mbStopRequested)
+    else if (mbStopRequested)
     {
         mbStopped = true;
         mbStopRequested = false;
@@ -256,7 +249,6 @@ bool Viewer::Stop()
     }
 
     return false;
-
 }
 
 void Viewer::Release()
@@ -265,4 +257,4 @@ void Viewer::Release()
     mbStopped = false;
 }
 
-}
+} // namespace ORB_SLAM2

@@ -63,6 +63,9 @@ ${PROJECT_SOURCE_DIR}/Thirdparty/g2o/lib/libg2o.so
 add_executable(mono_kitti Examples/Monocular/mono_kitti.cc)
 target_link_libraries(mono_kitti ${PROJECT_NAME})
 
+add_executable(mono_rpc Examples/Monocular/mono_rpc.cc)
+target_link_libraries(mono_rpc ${PROJECT_NAME})
+
 add_executable(stereo_kitti Examples/Stereo/stereo_kitti.cpp)
 target_link_libraries(stereo_kitti ${PROJECT_NAME})
 

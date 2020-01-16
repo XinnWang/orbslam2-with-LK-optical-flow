@@ -1,5 +1,5 @@
 # orbslam2 with LK optical flow
- This project is modified from orbslam2. All dependencies are consistent with orbslam2, but only support RGBD camera now
+ This project is modified from orbslam2. All dependencies are consistent with orbslam2, try to support monocular camera now.
 
 This project：
 
@@ -18,11 +18,4 @@ chmod +x run.sh
 
 ./build.sh
 
-./run.sh
-
- If you want to use your own camera, please refer to orbsalm2.
- 
-# Extract ORB Features:
-![image](https://github.com/suffeeen/orbslam2-with-LK-optical-flow/blob/master/result_pics/Screenshot%20from%202020-01-15%2021-15-24.png?raw=true)
-# Track ORB Features:
-![image](https://github.com/suffeeen/orbslam2-with-LK-optical-flow/blob/master/result_pics/Screenshot%20from%202020-01-15%2021-15-25.png?raw=true)
+./run_rpc.sh
